@@ -4,12 +4,6 @@ import PackageDescription
 let package = Package(
     name: "GoProStretch",
     platforms: [.iOS(.v15)],
-    products: [.executable(name: "GoProStretch", targets: ["GoProStretch"])],
-    targets: [
-        .executableTarget(
-            name: "GoProStretch",
-            path: ".",
-            sources: ["ContentView.swift"]
-        )
-    ]
+    products: [.library(name: "GoProStretch", targets: ["GoProStretch"])],
+    targets: [.target(name: "GoProStretch", path: ".")]
 )
