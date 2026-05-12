@@ -4,20 +4,15 @@ workflows:
     instance_type: mac_mini_m1
     max_build_duration: 30
     scripts:
-      - name: Initialize App Structure
+      - name: Build Library
         script: |
-          # Создаем структуру проекта Xcode на лету
-          mkdir -p GoProApp/Base.lproj
-          mv ContentView.swift GoProApp/
-          mv Info.plist GoProApp/
-      - name: Build Unsigned IPA
+          swift build -c release --triple arm64-apple-ios15.0
+      - name: Create IPA Structure
         script: |
-          # Собираем без подписи, чтобы не платить за сертификат
-          xcodebuild -archivePath $CM_BUILD_DIR/GoPro.xcarchive \
-            -allowProvisioningUpdates \
-            -sdk iphoneos \
-            CODE_SIGNING_ALLOWED=NO \
-            CODE_SIGN_ING_REQUIRED=NO \
-            archive
+          mkdir -p Payload/GoProStretch.app
+          # Копируем скомпилированный файл (имя может отличаться, проверим)
+          find .build -name "GoProStretch" -type f -exec cp {} Payload/GoProStretch.app/ \;
+          cp Info.plist Payload/GoProStretch.app/
+          zip -r GoProStretch.ipa Payload
     artifacts:
-      - $CM_BUILD_DIR/*.ipa
+      - "*.ipa"
