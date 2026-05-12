@@ -1,14 +1,18 @@
 workflows:
   ios-swiftui-workflow:
     name: iOS SwiftUI Build
-    max_build_duration: 30
     instance_type: mac_mini_m1
     scripts:
-      - name: Initialize Project
-        script: | 
-          echo "Инициализация..."
-      - name: Build
-        script: | 
-          echo "Сборка приложения kitanaizyxx..."
+      - name: Compile Swift Binary
+        script: |
+          # Компилируем файл в исполняемый бинарник
+          swiftc ContentView.swift -o GoproTool
+      - name: Create Dummy IPA
+        script: |
+          # Создаем структуру папок для IPA
+          mkdir -p Payload/GoproTool.app
+          cp GoproTool Payload/GoproTool.app/
+          cp Info.plist Payload/GoproTool.app/
+          zip -r GoproTool.ipa Payload
     artifacts:
       - "*.ipa"
