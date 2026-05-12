@@ -1,17 +1,23 @@
 workflows:
-  ios-swiftui-workflow:
-    name: iOS SwiftUI Build
+  ios-workflow:
+    name: GoPro Stretch Build
     instance_type: mac_mini_m1
+    max_build_duration: 30
     scripts:
-      - name: Build App
+      - name: Initialize App Structure
         script: |
-          # Собираем проект через стандартный инструмент Apple
-          xcrun swift build -c release --triple arm64-apple-ios15.0-macabi
-      - name: Package IPA
+          # Создаем структуру проекта Xcode на лету
+          mkdir -p GoProApp/Base.lproj
+          mv ContentView.swift GoProApp/
+          mv Info.plist GoProApp/
+      - name: Build Unsigned IPA
         script: |
-          mkdir -p Payload/GoProStretch.app
-          cp .build/arm64-apple-ios15.0-macabi/release/GoProStretch Payload/GoProStretch.app/
-          cp Info.plist Payload/GoProStretch.app/
-          zip -r GoProStretch.ipa Payload
+          # Собираем без подписи, чтобы не платить за сертификат
+          xcodebuild -archivePath $CM_BUILD_DIR/GoPro.xcarchive \
+            -allowProvisioningUpdates \
+            -sdk iphoneos \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGN_ING_REQUIRED=NO \
+            archive
     artifacts:
-      - "*.ipa"
+      - $CM_BUILD_DIR/*.ipa
